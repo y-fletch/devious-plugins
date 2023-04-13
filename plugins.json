@@ -1,1 +1,57 @@
-[{"projectUrl":"https://github.com/y-fletch/ocplugins","provider":"yfletch","name":"Action bars","description":"Keybind-able action bars","id":"actionbars-plugin","releases":[{"date":"2023-04-13","sha512sum":"4C1A7639FF4A8B41BF57784155FC288D13022DB36DB9F4CB5C4A9D6C62FDAC8EE44A72C83ACFE76DA3ADAD2C0A23F48A6895DD51E319CD7020E386C1D59F4670","version":"0.0.1","url":"https://github.com/y-fletch/ocplugins/blob/main/release/action-bars-0.0.1.jar?raw=true","requires":"^1.0.0"}]}, {"projectUrl":"https://github.com/y-fletch/ocplugins","provider":"yfletch","name":"Auto-flicker","description":"Auto flick any prayer","id":"autoflicker-plugin","releases":[{"date":"2023-04-13","sha512sum":"ED20A7911693CB620C915AFEBCF085C323740D45839E8940C5A1B64E41CABB867E4F3826953775E95F856256103D90781375FB9E0C060B2CFC87FBBE5DAA64AC","version":"1.0.0","url":"https://github.com/y-fletch/ocplugins/blob/main/release/auto-flicker-1.0.0.jar?raw=true","requires":"^1.0.0"}]}, {"projectUrl":"https://github.com/y-fletch/ocplugins","provider":"yfletch","name":"Reply GPT","description":"Behold the power of AI","id":"replygpt-plugin","releases":[{"date":"2023-04-13","sha512sum":"D7D375C37C375435EDDC70703A70FAD187ABF6A0DB13772685CE9BDC604B6D76C8600FA80D50183A9B5612081B395A328739A622C6FAF0D6C494C443244AF453","version":"0.0.1","url":"https://github.com/y-fletch/ocplugins/blob/main/release/reply-gpt-0.0.1.jar?raw=true","requires":"^1.0.0"}]}]
+[
+  {
+    "projectUrl": "https://github.com/y-fletch/devious-plugins",
+    "provider": "yfletch",
+    "name": "Action bars",
+    "description": "Keybind-able action bars",
+    "id": "actionbars-plugin",
+    "releases": [
+      {
+        "date": "2023-04-13",
+        "sha512sum": "4C1A7639FF4A8B41BF57784155FC288D13022DB36DB9F4CB5C4A9D6C62FDAC8EE44A72C83ACFE76DA3ADAD2C0A23F48A6895DD51E319CD7020E386C1D59F4670",
+        "version": "0.0.1",
+        "url": "https://github.com/y-fletch/devious-plugins/blob/main/release/action-bars-0.0.1.jar?raw=true",
+        "requires": "^1.0.0"
+      }
+    ]
+  },
+  {
+    "projectUrl": "https://github.com/y-fletch/devious-plugins",
+    "provider": "yfletch",
+    "name": "Auto-flicker",
+    "description": "Auto flick any prayer",
+    "id": "autoflicker-plugin",
+    "releases": [
+      {
+        "date": "2023-04-13",
+        "sha512sum": "ED20A7911693CB620C915AFEBCF085C323740D45839E8940C5A1B64E41CABB867E4F3826953775E95F856256103D90781375FB9E0C060B2CFC87FBBE5DAA64AC",
+        "version": "1.0.0",
+        "url": "https://github.com/y-fletch/devious-plugins/blob/main/release/auto-flicker-1.0.0.jar?raw=true",
+        "requires": "^1.0.0"
+      },
+      {
+        "date": "2023-04-13",
+        "sha512sum": "39903DCD26A1F83ECC6BE2B6C532C0C609D3A5A8082266BCBF62AFA7421341488A2995E82D46A2E421508AEEF2365A1570BB9FE21B001EE40B1955FC67EA8F1A",
+        "version": "1.0.1",
+        "url": "https://github.com/y-fletch/devious-plugins/blob/main/release/auto-flicker-1.0.1.jar?raw=true",
+        "requires": "^1.0.0"
+      }
+    ]
+  },
+  {
+    "projectUrl": "https://github.com/y-fletch/devious-plugins",
+    "provider": "yfletch",
+    "name": "Reply GPT",
+    "description": "Behold the power of AI",
+    "id": "replygpt-plugin",
+    "releases": [
+      {
+        "date": "2023-04-13",
+        "sha512sum": "D7D375C37C375435EDDC70703A70FAD187ABF6A0DB13772685CE9BDC604B6D76C8600FA80D50183A9B5612081B395A328739A622C6FAF0D6C494C443244AF453",
+        "version": "0.0.1",
+        "url": "https://github.com/y-fletch/devious-plugins/blob/main/release/reply-gpt-0.0.1.jar?raw=true",
+        "requires": "^1.0.0"
+      }
+    ]
+  }
+]
