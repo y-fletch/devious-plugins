@@ -1,36 +1,82 @@
 package com.yfletch.actionbars;
 
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.runelite.client.input.KeyManager;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Getter
 @AllArgsConstructor
 public class ActionBar
 {
+	public final static int NUM_ACTIONS = 10;
+
 	private int id;
-	private List<Action> actions;
+	private Action[] actions;
 
-	public void refreshHotkeys(KeyManager keyManager)
+	public int getNextEmptyActionIndex()
 	{
-		unregisterHotkeys(keyManager);
-		registerHotkeys(keyManager);
+		for (int i = 0; i < NUM_ACTIONS; i++)
+		{
+			if (actions[i] == null)
+			{
+				return i;
+			}
+		}
+
+		return -1;
 	}
 
-	public void registerHotkeys(KeyManager keyManager)
+	public void add(Action action)
 	{
-		for (var action : actions)
+		final var index = getNextEmptyActionIndex();
+		if (index == -1)
 		{
-			keyManager.registerKeyListener(action.getHotkeyListener());
+			throw new IllegalArgumentException("Cannot insert new action");
+		}
+
+		actions[getNextEmptyActionIndex()] = action;
+	}
+
+	public void remove(Action action)
+	{
+		for (int i = 0; i < NUM_ACTIONS; i++)
+		{
+			if (actions[i] == action)
+			{
+				actions[i] = null;
+			}
 		}
 	}
 
-	public void unregisterHotkeys(KeyManager keyManager)
+	public void swapRight(Action action)
 	{
-		for (var action : actions)
+		for (int i = 0; i < NUM_ACTIONS - 1; i++)
 		{
-			keyManager.unregisterKeyListener(action.getHotkeyListener());
+			if (actions[i] == action)
+			{
+				actions[i] = actions[i + 1];
+				actions[i + 1] = action;
+				return;
+			}
 		}
+	}
+
+	public void swapLeft(Action action)
+	{
+		for (int i = 1; i < NUM_ACTIONS; i++)
+		{
+			if (actions[i] == action)
+			{
+				actions[i] = actions[i - 1];
+				actions[i - 1] = action;
+				return;
+			}
+		}
+	}
+
+	public void clear()
+	{
+		actions = new Action[NUM_ACTIONS];
 	}
 }

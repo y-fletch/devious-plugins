@@ -23,9 +23,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-version = "0.0.1"
+version = "0.0.2-alpha"
 
-project.extra["PluginName"] = "Action bars"
+project.extra["PluginName"] = "Action bars [alpha]"
 project.extra["PluginDescription"] = "Keybind-able action bars"
 
 tasks {

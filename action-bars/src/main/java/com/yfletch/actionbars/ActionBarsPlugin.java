@@ -11,6 +11,7 @@ import net.runelite.api.Client;
 import net.runelite.api.KeyCode;
 import net.runelite.api.MenuAction;
 import net.runelite.api.events.MenuEntryAdded;
+import net.runelite.api.events.PostMenuSort;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.Keybind;
 import net.runelite.client.eventbus.Subscribe;
@@ -24,7 +25,7 @@ import org.pf4j.Extension;
 @Slf4j
 @Extension
 @PluginDescriptor(
-	name = "Action bars",
+	name = "Action bars [alpha]",
 	description = "Keybind-able action bars"
 )
 public class ActionBarsPlugin extends Plugin
@@ -47,6 +48,12 @@ public class ActionBarsPlugin extends Plugin
 	private ActionBarManager actionBarManager;
 
 	@Inject
+	private MenuEntryManager menuEntryManager;
+
+	@Inject
+	private KeybindListener keybindListener;
+
+	@Inject
 	private ActionBarOverlay actionBarOverlay;
 
 	@Override
@@ -54,6 +61,7 @@ public class ActionBarsPlugin extends Plugin
 	{
 		actionBarManager.startUp();
 		overlayManager.add(actionBarOverlay);
+		keyManager.registerKeyListener(keybindListener);
 	}
 
 	@Override
@@ -61,6 +69,7 @@ public class ActionBarsPlugin extends Plugin
 	{
 		actionBarManager.shutDown();
 		overlayManager.remove(actionBarOverlay);
+		keyManager.unregisterKeyListener(keybindListener);
 	}
 
 	@Subscribe
@@ -82,6 +91,14 @@ public class ActionBarsPlugin extends Plugin
 					createAction(SavedAction.fromMenuEntry(menuEntry));
 				});
 		}
+
+		menuEntryManager.createMenuEntries();
+	}
+
+	@Subscribe
+	public void onPostMenuSort(PostMenuSort event)
+	{
+		menuEntryManager.setHasCreatedEntries(false);
 	}
 
 	private void createAction(SavedAction savedAction)
