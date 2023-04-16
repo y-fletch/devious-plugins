@@ -2,6 +2,7 @@ package com.yfletch.autoflicker;
 
 import com.google.inject.Inject;
 import com.google.inject.Provides;
+import com.yfletch.autoflicker.util.PrayerHelper;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -11,13 +12,11 @@ import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.MenuAction;
-import net.runelite.api.Prayer;
 import net.runelite.api.SoundEffectID;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.api.events.PostMenuSort;
 import net.runelite.api.events.SoundEffectPlayed;
-import net.runelite.api.util.Text;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
@@ -74,14 +73,60 @@ public class AutoFlickerPlugin extends Plugin
 	private ClientThread clientThread;
 
 	@Inject
+	private PrayerHelper prayerHelper;
+
+	@Inject
+	private BossFlicker bossFlicker;
+
+	@Inject
 	private AutoFlickerConfig config;
 
 	private final List<Widget> flickWidgets = new ArrayList<>();
 	private final Executor DEACTIVATE_EXECUTOR = Executors.newSingleThreadExecutor();
 
+	private Widget bossFlickWidget = null;
+
 	@Subscribe
 	public void onGameTick(GameTick event)
 	{
+//		log.info(RegionPoint.fromWorld(client.getLocalPlayer().getWorldLocation()).toString());
+
+		// get overhead from boss flicker
+		final var overhead = bossFlicker.getPrayer();
+		if (overhead != null)
+		{
+			log.info("BossFlicker - changing prayer to " + overhead.name());
+
+			final var prevWidget = bossFlickWidget;
+			bossFlickWidget = prayerHelper.getWidget(overhead);
+			assert bossFlickWidget != null;
+
+			if (config.onlySwitch())
+			{
+				if (!isActive(bossFlickWidget))
+				{
+					click(bossFlickWidget);
+				}
+			}
+			else if (bossFlickWidget != prevWidget)
+			{
+
+				flickWidgets.remove(prevWidget);
+				flickWidgets.add(bossFlickWidget);
+				disableIncompatiblePrayers(bossFlickWidget);
+			}
+		}
+		else
+		{
+			// disable old prayer
+			if (bossFlickWidget != null && isActive(bossFlickWidget))
+			{
+				click(bossFlickWidget);
+				flickWidgets.remove(bossFlickWidget);
+				bossFlickWidget = null;
+			}
+		}
+
 		// activate any inactive prayers
 		clientThread.invokeLater(this::clickInactiveWidgets);
 
@@ -217,27 +262,14 @@ public class AutoFlickerPlugin extends Plugin
 		}
 	}
 
-	private Prayer getPrayerForWidget(Widget widget)
-	{
-		if (widget.getName().equals("Quick-prayers"))
-		{
-			return null;
-		}
-
-		final var enumName = Text.removeTags(widget.getName())
-			.replaceAll(" ", "_")
-			.toUpperCase();
-		return Prayer.valueOf(enumName);
-	}
-
 	private void disableIncompatiblePrayers(Widget widget)
 	{
-		final var prayer = getPrayerForWidget(widget);
+		final var prayer = prayerHelper.getPrayer(widget);
 		if (prayer == null) return;
 
 		for (final var otherWidget : new ArrayList<>(flickWidgets))
 		{
-			final var otherPrayer = getPrayerForWidget(otherWidget);
+			final var otherPrayer = prayerHelper.getPrayer(otherWidget);
 			if (otherPrayer != null
 				&& prayer != otherPrayer
 				&& PrayerType.areIncompatible(prayer, otherPrayer))
