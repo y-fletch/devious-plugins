@@ -64,7 +64,7 @@ public class Vorkath implements AutoFlickRule
 	@Override
 	public boolean shouldProtectMissiles()
 	{
-		return bossHelper.incomingProjectile(SPIKY_BALL);
+		return true;
 	}
 
 	@Override

@@ -95,8 +95,6 @@ public class AutoFlickerPlugin extends Plugin
 		final var overhead = bossFlicker.getPrayer();
 		if (overhead != null)
 		{
-			log.info("BossFlicker - changing prayer to " + overhead.name());
-
 			final var prevWidget = bossFlickWidget;
 			bossFlickWidget = prayerHelper.getWidget(overhead);
 			assert bossFlickWidget != null;
