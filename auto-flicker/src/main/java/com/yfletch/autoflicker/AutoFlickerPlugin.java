@@ -193,7 +193,7 @@ public class AutoFlickerPlugin extends Plugin
 		{
 			final var isActivated = menuEntry.getOption().equals("Deactivate");
 			final var widget = event.getMenuEntry().getWidget();
-			if (widget == null)
+			if (widget == null || prayerHelper.getPrayer(widget) == null)
 			{
 				return;
 			}

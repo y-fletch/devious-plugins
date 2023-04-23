@@ -2,6 +2,7 @@ rootProject.name = "devious-plugins"
 
 include(":action-bars")
 include(":auto-flicker")
+include(":auto-switcher")
 include(":reply-gpt")
 
 for (project in rootProject.children) {

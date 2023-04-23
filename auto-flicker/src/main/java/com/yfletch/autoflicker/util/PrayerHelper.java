@@ -27,10 +27,17 @@ public class PrayerHelper
 
 	public Prayer getPrayer(String name)
 	{
-		final var enumName = Text.removeTags(name)
-			.replaceAll(" ", "_")
-			.toUpperCase();
-		return Prayer.valueOf(enumName);
+		try
+		{
+			final var enumName = Text.removeTags(name)
+				.replaceAll(" ", "_")
+				.toUpperCase();
+			return Prayer.valueOf(enumName);
+		}
+		catch (IllegalArgumentException e)
+		{
+			return null;
+		}
 	}
 
 	public Widget getWidget(Prayer prayer)
