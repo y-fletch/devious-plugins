@@ -26,6 +26,12 @@ public class ProjectileHelper
 			.collect(Collectors.toList());
 	}
 
+	public boolean isProjectileVisible(int... projectileId)
+	{
+		List<Integer> list = Ints.asList(projectileId);
+		return !query(p -> list.contains(p.getId())).isEmpty();
+	}
+
 	public boolean isProjectileTargeting(Actor actor, int... projectileId)
 	{
 		List<Integer> list = Ints.asList(projectileId);

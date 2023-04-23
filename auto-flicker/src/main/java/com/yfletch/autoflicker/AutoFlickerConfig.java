@@ -162,4 +162,16 @@ public interface AutoFlickerConfig extends Config
 	{
 		return false;
 	}
+
+	@ConfigItem(
+		keyName = "flickZebak",
+		name = "Zebak",
+		description = "Zebak",
+		section = autoFlickBosses,
+		position = 1
+	)
+	default boolean flickZebak()
+	{
+		return false;
+	}
 }

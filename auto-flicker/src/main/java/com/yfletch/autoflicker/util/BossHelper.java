@@ -95,6 +95,11 @@ public class BossHelper
 		return projectileHelper.isProjectileTargetingPlayer(projectileIds);
 	}
 
+	public boolean isProjectileVisible(int... projectileIds)
+	{
+		return projectileHelper.isProjectileVisible(projectileIds);
+	}
+
 	public boolean isNpcVisible(int... npcId)
 	{
 		return npcHelper.getNearest(npcId) != null;

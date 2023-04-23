@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import com.yfletch.autoflicker.bosses.AutoFlickRule;
 import com.yfletch.autoflicker.bosses.KingBlackDragon;
 import com.yfletch.autoflicker.bosses.Vorkath;
+import com.yfletch.autoflicker.bosses.Zebak;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -18,10 +19,11 @@ public class BossFlicker
 {
 	@Inject private Vorkath vorkath;
 	@Inject private KingBlackDragon kingBlackDragon;
+	@Inject private Zebak zebak;
 
 	private List<AutoFlickRule> getEnabledRules()
 	{
-		return Stream.of(vorkath, kingBlackDragon)
+		return Stream.of(vorkath, kingBlackDragon, zebak)
 			.filter(AutoFlickRule::isEnabled)
 			.collect(Collectors.toList());
 	}
