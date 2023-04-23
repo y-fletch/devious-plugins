@@ -2,13 +2,10 @@ package com.yfletch.autoflicker;
 
 import com.google.inject.Inject;
 import com.google.inject.Provides;
+import com.yfletch.autoflicker.switchers.DefensiveSwitcher;
+import com.yfletch.autoflicker.switchers.OffensiveSwitcher;
 import com.yfletch.autoflicker.util.PrayerHelper;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
@@ -18,7 +15,6 @@ import net.runelite.api.events.GameTick;
 import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.api.events.PostMenuSort;
 import net.runelite.api.events.SoundEffectPlayed;
-import net.runelite.api.widgets.Widget;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
@@ -67,120 +63,53 @@ public class AutoFlickerPlugin extends Plugin
 		SoundEffectID.PRAYER_DEACTIVE_VWOOP
 	);
 
-	@Inject
-	private Client client;
+	@Inject private Client client;
+	@Inject private ClientThread clientThread;
 
-	@Inject
-	private ClientThread clientThread;
+	@Inject private PrayerHelper prayerHelper;
+	@Inject private PrayerFlicker prayerFlicker;
+	@Inject private DefensiveSwitcher defensiveSwitcher;
+	@Inject private OffensiveSwitcher offensiveSwitcher;
 
-	@Inject
-	private PrayerHelper prayerHelper;
-
-	@Inject
-	private BossFlicker bossFlicker;
-
-	@Inject
-	private WeaponFlicker weaponFlicker;
-
-	@Inject
-	private AutoFlickerConfig config;
-
-	private final List<Widget> flickWidgets = new ArrayList<>();
-	private final Executor DEACTIVATE_EXECUTOR = Executors.newSingleThreadExecutor();
-
-	private Widget bossFlickWidget = null;
-	private List<Widget> weaponFlickWidgets = null;
+	@Inject private AutoFlickerConfig config;
 
 	@Subscribe
 	public void onGameTick(GameTick event)
 	{
-//		log.info(RegionPoint.fromWorld(client.getLocalPlayer().getWorldLocation()).toString());
-
-		// get overhead from boss flicker
-		final var overhead = bossFlicker.getPrayer();
-		if (overhead != null)
+		// apply boss/weapon flicks here
+		final var defensivePrayers = defensiveSwitcher.getPrayers();
+		if (defensivePrayers != null)
 		{
-			final var prevWidget = bossFlickWidget;
-			bossFlickWidget = prayerHelper.getWidget(overhead);
-			assert bossFlickWidget != null;
-
-			if (config.onlySwitch())
-			{
-				if (!isActive(bossFlickWidget))
-				{
-					click(bossFlickWidget);
-				}
-			}
-			else if (bossFlickWidget != prevWidget)
-			{
-
-				flickWidgets.remove(prevWidget);
-				flickWidgets.add(bossFlickWidget);
-				disableIncompatiblePrayers(bossFlickWidget);
-			}
+			prayerFlicker.activate(defensivePrayers);
 		}
 		else
 		{
-			// disable old prayer
-			if (bossFlickWidget != null && isActive(bossFlickWidget))
+			// attempt to disable the old prayers
+			final var previousDefensivePrayers = defensiveSwitcher.getPreviousPrayers();
+			if (previousDefensivePrayers != null)
 			{
-				click(bossFlickWidget);
-				flickWidgets.remove(bossFlickWidget);
-				bossFlickWidget = null;
+				prayerFlicker.deactivate(previousDefensivePrayers);
+				defensiveSwitcher.clearPreviousPrayers();
 			}
 		}
 
-		final var offensives = weaponFlicker.getPrayers();
-		if (offensives != null)
+		final var offensivePrayers = offensiveSwitcher.getPrayers();
+		if (offensivePrayers != null)
 		{
-			final var prevWidgets = weaponFlickWidgets;
-			weaponFlickWidgets = offensives.stream().map(p -> prayerHelper.getWidget(p)).collect(Collectors.toList());
-
-			if (weaponFlickWidgets != prevWidgets)
-			{
-				flickWidgets.removeAll(prevWidgets);
-				flickWidgets.addAll(weaponFlickWidgets);
-				for (final var widget : weaponFlickWidgets)
-				{
-					disableIncompatiblePrayers(widget);
-				}
-			}
+			prayerFlicker.activate(offensivePrayers);
 		}
 		else
 		{
-			// disable old prayers
-			if (weaponFlickWidgets != null)
+			// attempt to disable the old prayers
+			final var previousOffensivePrayers = offensiveSwitcher.getPreviousPrayers();
+			if (previousOffensivePrayers != null)
 			{
-				for (final var widget : weaponFlickWidgets)
-				{
-					click(widget);
-				}
-				flickWidgets.removeAll(weaponFlickWidgets);
+				prayerFlicker.deactivate(previousOffensivePrayers);
+				offensiveSwitcher.clearPreviousPrayers();
 			}
-			weaponFlickWidgets = null;
 		}
 
-		// activate any inactive prayers
-		clientThread.invokeLater(this::clickInactiveWidgets);
-
-		DEACTIVATE_EXECUTOR.execute(() -> {
-			try
-			{
-				Thread.sleep(50);
-
-				// deactivate
-				clientThread.invokeLater(this::clickWidgets);
-
-				Thread.sleep(200);
-
-				// activate
-				clientThread.invokeLater(this::clickWidgets);
-			}
-			catch (InterruptedException e)
-			{
-				e.printStackTrace();
-			}
-		});
+		prayerFlicker.flickAll();
 	}
 
 	@Subscribe
@@ -191,34 +120,26 @@ public class AutoFlickerPlugin extends Plugin
 		if (menuEntry.getOption().equals("Activate")
 			|| menuEntry.getOption().equals("Deactivate"))
 		{
-			final var isActivated = menuEntry.getOption().equals("Deactivate");
-			final var widget = event.getMenuEntry().getWidget();
-			if (widget == null || prayerHelper.getPrayer(widget) == null)
-			{
-				return;
-			}
+			final var widget = menuEntry.getWidget();
+			if (widget == null) return;
 
-			final var enabled = flickWidgets.contains(widget);
+			final var prayer = prayerHelper.getPrayer(widget);
+			if (prayer == null) return;
+
+			final var isFlicking = prayerFlicker.isFlicking(prayer);
 
 			client.createMenuEntry(-1)
-				.setOption(enabled ? STOP_FLICK : FLICK)
+				.setOption(isFlicking ? STOP_FLICK : FLICK)
 				.setTarget(event.getTarget())
 				.setType(MenuAction.RUNELITE)
 				.onClick(e -> {
-					log.info("Auto flick - " + (enabled ? "disabled: " : "enabled: ") + menuEntry.getTarget());
-
-					if (enabled)
+					if (isFlicking)
 					{
-						flickWidgets.remove(widget);
-						if (isActivated)
-						{
-							click(widget);
-						}
+						prayerFlicker.deactivate(prayer);
 						return;
 					}
 
-					flickWidgets.add(widget);
-					disableIncompatiblePrayers(widget);
+					prayerFlicker.activate(prayer);
 				});
 		}
 	}
@@ -262,64 +183,6 @@ public class AutoFlickerPlugin extends Plugin
 				event.consume();
 			}
 		}
-	}
-
-	private void click(Widget widget)
-	{
-		client.invokeMenuAction(
-			"Activate",
-			widget.getName(),
-			1,
-			MenuAction.CC_OP.getId(),
-			-1,
-			widget.getId()
-		);
-	}
-
-	private void clickInactiveWidgets()
-	{
-		for (final var widget : flickWidgets)
-		{
-			if (!isActive(widget))
-			{
-				click(widget);
-			}
-		}
-	}
-
-	private void clickWidgets()
-	{
-		for (final var widget : flickWidgets)
-		{
-			click(widget);
-		}
-	}
-
-	private void disableIncompatiblePrayers(Widget widget)
-	{
-		final var prayer = prayerHelper.getPrayer(widget);
-		if (prayer == null) return;
-
-		for (final var otherWidget : new ArrayList<>(flickWidgets))
-		{
-			final var otherPrayer = prayerHelper.getPrayer(otherWidget);
-			if (otherPrayer != null
-				&& prayer != otherPrayer
-				&& PrayerType.areIncompatible(prayer, otherPrayer))
-			{
-				flickWidgets.remove(otherWidget);
-				if (isActive(otherWidget))
-				{
-					click(otherWidget);
-				}
-			}
-		}
-	}
-
-	private boolean isActive(Widget widget)
-	{
-		final var actions = widget.getActions();
-		return actions != null && Arrays.asList(actions).contains("Deactivate");
 	}
 
 	@Provides

@@ -1,11 +1,11 @@
-package com.yfletch.autoflicker.bosses;
+package com.yfletch.autoflicker.switchers.bosses;
 
 import com.google.inject.Inject;
 import com.yfletch.autoflicker.AutoFlickerConfig;
 import com.yfletch.autoflicker.util.BossHelper;
 import net.runelite.api.Prayer;
 
-public class Vorkath implements AutoFlickRule
+public class Vorkath implements AutoSwitchRule
 {
 	private static final int DRAGON_FIRE = 393;
 	private static final int ICE_BARRAGE = 395;
@@ -33,43 +33,25 @@ public class Vorkath implements AutoFlickRule
 	}
 
 	@Override
-	public Prayer[] getPriority()
+	public Prayer getPrayer()
 	{
-		return new Prayer[]{
-			Prayer.PROTECT_FROM_MELEE,
-			Prayer.PROTECT_FROM_MAGIC,
-			Prayer.PROTECT_FROM_MISSILES
-		};
-	}
+		if (bossHelper.npcHasAnimation(MELEE_ANIM, VORKATHS))
+		{
+			return Prayer.PROTECT_FROM_MELEE;
+		}
 
-	@Override
-	public boolean shouldProtectMelee()
-	{
-		return bossHelper.npcHasAnimation(MELEE_ANIM, VORKATHS);
-	}
-
-	@Override
-	public boolean shouldProtectMagic()
-	{
-		return bossHelper.incomingProjectile(
+		if (bossHelper.incomingProjectile(
 			DRAGON_FIRE,
 			ICE_BARRAGE,
 			PURPLE_FIRE,
 			VENOM_FIRE,
 			BLUE_FIRE,
 			SUPER_FIRE
-		);
-	}
+		))
+		{
+			return Prayer.PROTECT_FROM_MAGIC;
+		}
 
-	@Override
-	public boolean shouldProtectMissiles()
-	{
-		return true;
-	}
-
-	@Override
-	public boolean shouldSmite()
-	{
-		return false;
+		return Prayer.PROTECT_FROM_MISSILES;
 	}
 }

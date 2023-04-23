@@ -1,4 +1,4 @@
-package com.yfletch.autoflicker.bosses;
+package com.yfletch.autoflicker.switchers.bosses;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -7,7 +7,7 @@ import com.yfletch.autoflicker.util.BossHelper;
 import net.runelite.api.Prayer;
 
 @Singleton
-public class KingBlackDragon implements AutoFlickRule
+public class KingBlackDragon implements AutoSwitchRule
 {
 	private static final int DRAGON_FIRE = 393;
 	private static final int TOXIC_FIRE = 394;
@@ -33,32 +33,18 @@ public class KingBlackDragon implements AutoFlickRule
 	}
 
 	@Override
-	public Prayer[] getPriority()
+	public Prayer getPrayer()
 	{
-		return new Prayer[]{Prayer.PROTECT_FROM_MAGIC, Prayer.PROTECT_FROM_MELEE};
-	}
+		if (bossHelper.incomingProjectile(DRAGON_FIRE, TOXIC_FIRE, SHOCKING_FIRE, ICY_FIRE))
+		{
+			return Prayer.PROTECT_FROM_MAGIC;
+		}
 
-	@Override
-	public boolean shouldProtectMelee()
-	{
-		return bossHelper.isBesideNpc(KING_BLACK_DRAGON);
-	}
+		if (bossHelper.isBesideNpc(KING_BLACK_DRAGON))
+		{
+			return Prayer.PROTECT_FROM_MELEE;
+		}
 
-	@Override
-	public boolean shouldProtectMagic()
-	{
-		return bossHelper.incomingProjectile(DRAGON_FIRE, TOXIC_FIRE, SHOCKING_FIRE, ICY_FIRE);
-	}
-
-	@Override
-	public boolean shouldProtectMissiles()
-	{
-		return false;
-	}
-
-	@Override
-	public boolean shouldSmite()
-	{
-		return false;
+		return null;
 	}
 }

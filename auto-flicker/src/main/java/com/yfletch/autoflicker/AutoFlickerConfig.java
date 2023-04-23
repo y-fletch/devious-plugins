@@ -9,9 +9,22 @@ import net.runelite.client.config.ConfigSection;
 public interface AutoFlickerConfig extends Config
 {
 	@ConfigItem(
+		name = "Enable flicking",
+		description = "Enable 1t flicking prayers. If disabled, all boss/weapon auto-flicks will only enable"
+			+ " the prayers - it won't flick them on and off each tick.",
+		keyName = "enableFlicking",
+		position = 0
+	)
+	default boolean enableFlicking()
+	{
+		return true;
+	}
+
+	@ConfigItem(
 		name = "Disable prayer sounds",
 		description = "Disable all prayer sounds",
-		keyName = "disableSounds"
+		keyName = "disableSounds",
+		position = 1
 	)
 	default boolean disableSounds()
 	{
@@ -21,7 +34,8 @@ public interface AutoFlickerConfig extends Config
 	@ConfigItem(
 		name = "Flick as default option",
 		description = "Set flick as the first option for prayers",
-		keyName = "firstOption"
+		keyName = "firstOption",
+		position = 2
 	)
 	default boolean firstOption()
 	{
@@ -31,7 +45,7 @@ public interface AutoFlickerConfig extends Config
 	@ConfigSection(
 		name = "Auto-flick offensives",
 		description = "",
-		position = 2
+		position = 3
 	)
 	String autoFlickOffensives = "autoFlickOffensives";
 
@@ -121,23 +135,9 @@ public interface AutoFlickerConfig extends Config
 	@ConfigSection(
 		name = "Auto-flick bosses",
 		description = "",
-		position = 3
+		position = 4
 	)
 	String autoFlickBosses = "autoFlickBosses";
-
-	@ConfigItem(
-		keyName = "onlySwitch",
-		name = "Only switch",
-		description = "Don't attempt to flick bosses, just switch prayers as needed. "
-			+ "Some bosses attack 1 tick after an animation, and flicking will not protect "
-			+ "the first tick after the plugin switches.",
-		section = autoFlickBosses,
-		position = 0
-	)
-	default boolean onlySwitch()
-	{
-		return true;
-	}
 
 	@ConfigItem(
 		keyName = "flickVorkath",
@@ -166,7 +166,7 @@ public interface AutoFlickerConfig extends Config
 	@ConfigItem(
 		keyName = "flickZebak",
 		name = "Zebak",
-		description = "Zebak",
+		description = "Includes Zebak in the Warden fight",
 		section = autoFlickBosses,
 		position = 1
 	)

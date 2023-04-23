@@ -45,8 +45,6 @@ public class AutoSwitcherPlugin extends Plugin
 	@Subscribe
 	public void onMenuOptionClicked(MenuOptionClicked event)
 	{
-		log.info(event.getMenuEntry().toString());
-
 		if (!EQUIP_OPTIONS.contains(event.getMenuOption()))
 		{
 			return;
@@ -90,8 +88,6 @@ public class AutoSwitcherPlugin extends Plugin
 
 	private void equip(int itemId)
 	{
-		log.info("Equip " + itemId);
-
 		final var index = getInventoryIndex(itemId);
 		if (index == -1)
 		{
@@ -104,6 +100,8 @@ public class AutoSwitcherPlugin extends Plugin
 		{
 			return;
 		}
+
+		log.info("Equip " + itemId);
 
 		clientThread.invokeLater(() -> {
 			client.invokeMenuAction(
