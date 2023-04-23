@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
@@ -79,12 +80,16 @@ public class AutoFlickerPlugin extends Plugin
 	private BossFlicker bossFlicker;
 
 	@Inject
+	private WeaponFlicker weaponFlicker;
+
+	@Inject
 	private AutoFlickerConfig config;
 
 	private final List<Widget> flickWidgets = new ArrayList<>();
 	private final Executor DEACTIVATE_EXECUTOR = Executors.newSingleThreadExecutor();
 
 	private Widget bossFlickWidget = null;
+	private List<Widget> weaponFlickWidgets = null;
 
 	@Subscribe
 	public void onGameTick(GameTick event)
@@ -123,6 +128,36 @@ public class AutoFlickerPlugin extends Plugin
 				flickWidgets.remove(bossFlickWidget);
 				bossFlickWidget = null;
 			}
+		}
+
+		final var offensives = weaponFlicker.getPrayers();
+		if (offensives != null)
+		{
+			final var prevWidgets = weaponFlickWidgets;
+			weaponFlickWidgets = offensives.stream().map(p -> prayerHelper.getWidget(p)).collect(Collectors.toList());
+
+			if (weaponFlickWidgets != prevWidgets)
+			{
+				flickWidgets.removeAll(prevWidgets);
+				flickWidgets.addAll(weaponFlickWidgets);
+				for (final var widget : weaponFlickWidgets)
+				{
+					disableIncompatiblePrayers(widget);
+				}
+			}
+		}
+		else
+		{
+			// disable old prayers
+			if (weaponFlickWidgets != null)
+			{
+				for (final var widget : weaponFlickWidgets)
+				{
+					click(widget);
+				}
+				flickWidgets.removeAll(weaponFlickWidgets);
+			}
+			weaponFlickWidgets = null;
 		}
 
 		// activate any inactive prayers

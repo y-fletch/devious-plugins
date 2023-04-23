@@ -29,6 +29,96 @@ public interface AutoFlickerConfig extends Config
 	}
 
 	@ConfigSection(
+		name = "Auto-flick offensives",
+		description = "",
+		position = 2
+	)
+	String autoFlickOffensives = "autoFlickOffensives";
+
+	@ConfigItem(
+		name = "Enabled",
+		description = "",
+		keyName = "flickOffensivePrayers",
+		section = autoFlickOffensives
+	)
+	default boolean flickOffensivePrayers()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "meleeWeapons",
+		name = "Melee weapons",
+		description = "Flick melee offensive prayer(s) when one of these weapons is equipped.",
+		section = autoFlickOffensives,
+		position = 0
+	)
+	default String meleeWeapons()
+	{
+		return "-1";
+	}
+
+	@ConfigItem(
+		keyName = "meleePrayers",
+		name = "Melee prayers",
+		description = "Melee prayers to flick - use the prayer enum name",
+		section = autoFlickOffensives,
+		position = 1
+	)
+	default String meleePrayers()
+	{
+		return "PIETY";
+	}
+
+	@ConfigItem(
+		keyName = "rangedWeapons",
+		name = "Ranged weapons",
+		description = "Flick ranged offensive prayer(s) when one of these weapons is equipped.",
+		section = autoFlickOffensives,
+		position = 2
+	)
+	default String rangedWeapons()
+	{
+		return "-1";
+	}
+
+	@ConfigItem(
+		keyName = "rangedPrayers",
+		name = "Ranged prayers",
+		description = "Ranged prayers to flick - use the prayer enum name",
+		section = autoFlickOffensives,
+		position = 3
+	)
+	default String rangedPrayers()
+	{
+		return "RIGOUR";
+	}
+
+	@ConfigItem(
+		keyName = "magicWeapons",
+		name = "Magic weapons",
+		description = "Flick magic offensive prayer(s) when one of these weapons is equipped.",
+		section = autoFlickOffensives,
+		position = 4
+	)
+	default String magicWeapons()
+	{
+		return "-1";
+	}
+
+	@ConfigItem(
+		keyName = "magicPrayers",
+		name = "Magic prayers",
+		description = "Magic prayers to flick - use the prayer enum name",
+		section = autoFlickOffensives,
+		position = 5
+	)
+	default String magicPrayers()
+	{
+		return "AUGURY";
+	}
+
+	@ConfigSection(
 		name = "Auto-flick bosses",
 		description = "",
 		position = 3

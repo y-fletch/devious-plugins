@@ -77,6 +77,8 @@ open class BootstrapTask : DefaultTask() {
                         "releases" to releases.toTypedArray()
                     ).jsonObject()
 
+                    println(pluginObject)
+
                     for (i in 0 until baseBootstrap.length()) {
                         val item = baseBootstrap.getJSONObject(i)
 
@@ -84,32 +86,40 @@ open class BootstrapTask : DefaultTask() {
                             continue
                         }
 
-                        if (it.project.version.toString() in item.getJSONArray("releases").toString()) {
-                            pluginAdded = true
+                        pluginAdded = true
+
+                        val fileName = "${it.project.name}-${it.project.version}"
+
+                        // version already exists
+                        if (fileName in item.getJSONArray("releases").toString()) {
                             plugins.add(item)
                             break
                         }
 
+                        // new version
                         plugins.add(
                             JsonMerger(arrayMergeMode = JsonMerger.ArrayMergeMode.MERGE_ARRAY).merge(
                                 item,
                                 pluginObject
                             )
                         )
-                        pluginAdded = true
+                        plugin.copyTo(
+                            Paths.get(
+                                finalReleaseDir.toString(),
+                                "${it.project.name}-${it.project.version}.jar"
+                            ).toFile()
+                        )
                     }
 
                     if (!pluginAdded) {
                         plugins.add(pluginObject)
+                        plugin.copyTo(
+                            Paths.get(
+                                finalReleaseDir.toString(),
+                                "${it.project.name}-${it.project.version}.jar"
+                            ).toFile()
+                        )
                     }
-
-                    plugin.copyTo(
-                        Paths.get(
-                            finalReleaseDir.toString(),
-                            "${it.project.name}-${it.project.version}.jar"
-                        ).toFile(),
-                        true
-                    )
                 }
             }
 

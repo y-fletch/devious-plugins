@@ -22,7 +22,12 @@ public class PrayerHelper
 			return null;
 		}
 
-		final var enumName = Text.removeTags(widget.getName())
+		return getPrayer(widget.getName());
+	}
+
+	public Prayer getPrayer(String name)
+	{
+		final var enumName = Text.removeTags(name)
 			.replaceAll(" ", "_")
 			.toUpperCase();
 		return Prayer.valueOf(enumName);
