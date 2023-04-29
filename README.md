@@ -26,10 +26,6 @@ RS3-like action bars, able to do almost any action in the game.
 - [ ] Object actions
 - [ ] Bank item actions
 
-## Auto Flicker
-
-Pray flick any prayer or quick prayers. Right click to flick/stop flicking the prayer. Prayer activation sounds can be disabled in the config.
-
 ## Reply GPT [alpha]
 
 Respond to public and private messages with ChatGPT. Requires an OpenAPI key.
